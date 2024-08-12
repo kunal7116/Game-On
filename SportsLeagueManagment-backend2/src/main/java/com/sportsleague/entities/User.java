@@ -22,8 +22,10 @@ public class User {
     private String firstname;
     private String lastname;
     private String email;
+    
     @Enumerated(EnumType.STRING)
     private Role role;
+    
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -33,5 +35,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<Payment> payments;
+    
+    
 }
 
