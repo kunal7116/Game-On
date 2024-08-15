@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sportsleague.DTO.UserDTO;
+import com.sportsleague.entities.Role;
 import com.sportsleague.entities.User;
 import com.sportsleague.exception.ResourceNotFoundException;
 import com.sportsleague.repository.UserRepository;
@@ -43,6 +44,9 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(UserDTO userDto) {
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole(Role.PLAYER); // Default to PLAYER role, you can change it based on your logic
+        }
         user = userRepository.save(user);
         return modelMapper.map(user, UserDTO.class);
     }
@@ -59,5 +63,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Integer userId) {
         userRepository.deleteById(userId);
+    }
+    
+
+    @Override
+    public UserDTO verifyUser(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid email or password"));
+
+        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+            return modelMapper.map(user, UserDTO.class);
+        } else {
+            return null; // or throw a specific exception
+        }
     }
 }

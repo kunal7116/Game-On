@@ -47,4 +47,10 @@ public class SportsController {
     public void deleteSports(@PathVariable Integer sportsId) {
         sportsService.deleteSports(sportsId);
     }
+    
+    @GetMapping("/city/{cityId}")
+    public List<SportsDTO> getSportsByCityId(@PathVariable Integer cityId) {
+        return sportsService.getSportsByCityId(cityId);
+    }
+
 }

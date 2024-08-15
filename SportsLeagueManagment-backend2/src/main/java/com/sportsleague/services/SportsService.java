@@ -10,4 +10,5 @@ public interface SportsService {
     SportsDTO createSports(SportsDTO sportsDTO);
     SportsDTO updateSports(Integer sportsId, SportsDTO sportsDTO);
     void deleteSports(Integer sportsId);
+	List<SportsDTO> getSportsByCityId(Integer cityId);
 }

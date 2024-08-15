@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 public class SportsDTO {
     private Integer sportsId;
-    private SportType sportsType;
+    private String sportType;
     private Integer cityId;
 }
 

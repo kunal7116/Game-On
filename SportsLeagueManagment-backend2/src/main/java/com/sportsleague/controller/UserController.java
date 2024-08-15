@@ -48,4 +48,15 @@ public class UserController {
     public void deleteUser(@PathVariable Integer userId) {
         userService.deleteUser(userId);
     }
+    
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> login(@RequestBody UserDTO loginDto) {
+        UserDTO userDto = userService.verifyUser(loginDto.getEmail(), loginDto.getPassword());
+        if (userDto != null) {
+            return ResponseEntity.ok(userDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
 }

@@ -55,4 +55,13 @@ public class SportsServiceImpl implements SportsService {
     public void deleteSports(Integer sportsId) {
         sportsRepository.deleteById(sportsId);
     }
+    
+    @Override
+    public List<SportsDTO> getSportsByCityId(Integer cityId) {
+        List<Sports> sportsList = sportsRepository.findByCityId(cityId);
+        return sportsList.stream()
+                .map(sports -> modelMapper.map(sports, SportsDTO.class))
+                .collect(Collectors.toList());
+    }
+
 }
