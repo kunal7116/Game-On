@@ -1,0 +1,81 @@
+.scrollable-container {
+  display: flex;
+  overflow-x: scroll; /* Allows horizontal scrolling */
+  padding: 20px;
+  scrollbar-width: none; /* Hides scrollbar in Firefox */
+  -ms-overflow-style: none; /* Hides scrollbar in IE and Edge */
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+.scrollable-container::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in Chrome, Safari, and Opera */
+}
+
+.custom-league-card {
+  display: flex;
+  flex-direction: row;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  min-width: 350px;
+  margin-right: 20px;
+  min-height: 200px;
+  border-radius: 8px;
+}
+
+.custom-league-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.league-image {
+  width: 50%;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.card-text {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.custom-league-card .card-title {
+  font-weight: bold;
+  color: #d9534f;
+}
+
+.custom-league-card .btn-danger {
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+.custom-league-card .btn-danger:hover {
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
+
+/* Scroll icons */
+.scroll-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #d9534f;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.scroll-icon.left {
+  left: 10px; /* Adjusts to be on the left side */
+}
+
+.scroll-icon.right {
+  right: 10px; /* Adjusts to be on the right side */
+}
+

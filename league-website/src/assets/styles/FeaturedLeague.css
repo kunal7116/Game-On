@@ -1,0 +1,34 @@
+.custom-featured-league {
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: none;
+}
+
+.custom-featured-league .card-img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.custom-featured-league .card-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.custom-featured-league .card-title {
+  color: #d9534f;
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.custom-featured-league .card-text {
+  color: #555;
+  font-size: 16px;
+  text-align: center;
+}

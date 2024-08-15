@@ -1,0 +1,34 @@
+.leagues-page h2 {
+  color: #d9534f;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.leagues-page p {
+  color: #555;
+}
+
+.leagues-page .card {
+  margin-bottom: 10px;
+}
+
+.leagues-page .card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.leagues-page .card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leagues-page .card-body p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.leagues-page .btn-primary {
+  margin-left: 20px;
+}

@@ -1,0 +1,34 @@
+.login-container {
+    padding: 50px 0;
+}
+
+.login-container .text-center {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.login-container .form-label {
+    font-weight: bold;
+}
+
+.login-container .form-control:focus {
+    border-color: #dc3545;
+    box-shadow: none;
+}
+
+.login-container .input-group-text {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border-color: #dc3545;
+}
+
+.login-container .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    font-weight: bold;
+}
+
+.login-container .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}

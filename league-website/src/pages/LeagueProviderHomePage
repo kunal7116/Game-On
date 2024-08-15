@@ -1,0 +1,15 @@
+import React from 'react';
+import { Container, Jumbotron } from 'react-bootstrap';
+
+const LeagueProviderHomePage = () => {
+    return (
+        <Container>
+            <Jumbotron>
+                <h1>Welcome, League Provider!</h1>
+                <p>This is your dashboard. Here you can manage leagues, view registrations, and more.</p>
+            </Jumbotron>
+        </Container>
+    );
+};
+
+export default LeagueProviderHomePage;

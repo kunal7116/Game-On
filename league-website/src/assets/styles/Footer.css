@@ -1,0 +1,11 @@
+.custom-footer {
+  background-color: #f8f9fa;
+  padding: 20px 0;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 50px; /* Adds space between footer and previous content */
+}
+
+.custom-footer p {
+  color: #555;
+  margin: 0;
+}

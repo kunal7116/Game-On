@@ -1,0 +1,31 @@
+.slider-container {
+  position: relative;
+}
+
+.fixed-caption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  color: white;
+}
+
+.website-title {
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  color: #FF5733; /* Customize the color as needed */
+}
+
+.website-description {
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  margin-top: 10px;
+}
+
+.custom-carousel .carousel-item img {
+  height: 100vh; /* Adjust to your desired height */
+  object-fit: cover;
+}

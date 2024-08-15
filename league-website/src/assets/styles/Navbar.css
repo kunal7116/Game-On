@@ -1,0 +1,29 @@
+.custom-navbar {
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-navbar .navbar-brand {
+    color: #d9534f;
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  
+  .custom-navbar .nav-link {
+    color: #555;
+    margin-right: 15px;
+    font-weight: 500;
+  }
+  
+  .custom-navbar .nav-link:hover {
+    color: #d9534f;
+  }
+  
+  .custom-navbar .dropdown-item {
+    color: #555;
+  }
+  
+  .custom-navbar .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+  
