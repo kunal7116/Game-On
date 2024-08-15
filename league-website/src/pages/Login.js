@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import '../assets/styles/Login.css';
 
 const Login = () => {
+    const { auth, login } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -15,6 +16,19 @@ const Login = () => {
 
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        // Redirect if already logged in
+        if (auth.token && auth.role) {
+            if (auth.role === 'ADMIN') {
+                navigate('/admin-home', { replace: true });
+            } else if (auth.role === 'PLAYER') {
+                navigate('/', { replace: true });
+            } else if (auth.role === 'LEAGUE_PROVIDER') {
+                navigate('/league-provider-home', { replace: true });
+            }
+        }
+    }, [auth, navigate]);
 
     const validate = () => {
         let formErrors = {};
@@ -42,18 +56,47 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (validate()) {
             try {
-                const response = await axios.post('http://localhost:8080/api/users/login', formData);
-                const user = response.data;
+                const response = await axios.post('http://localhost:8080/auth/signin', formData);
+                const token = response.data.jwt || response.data.token;
 
-                if (user.role === 'ADMIN') {
-                    navigate('/admin-home');  // Redirect to admin homepage
-                } else if (user.role === 'PLAYER') {
-                    navigate('/');  // Redirect to player homepage
-                } else if (user.role === 'LEAGUE_PROVIDER') {
-                    navigate('/league-provider-home');  // Redirect to league provider homepage
+                if (!token) {
+                    throw new Error("No token found in response");
                 }
+
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const decodedToken = JSON.parse(window.atob(base64));
+
+                const roles = decodedToken.authorities || [];
+                const username = decodedToken.sub;
+
+                if (roles.length === 0) {
+                    throw new Error("No roles found in token");
+                }
+
+                // Map the role to full names
+                let role = roles[0];
+                switch (role) {
+                    case 'P':
+                        role = 'PLAYER';
+                        break;
+                    case 'A':
+                        role = 'ADMIN';
+                        break;
+                    case 'LP':
+                        role = 'LEAGUE_PROVIDER';
+                        break;
+                    default:
+                        console.warn(`Unknown role: ${role}`);
+                        setErrors({ apiError: 'Unknown role' });
+                        return;
+                }
+
+                // Use login function from context, pass navigate here
+                login(token, username, role, navigate);
 
             } catch (error) {
                 console.error('Login error:', error);

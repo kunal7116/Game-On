@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../assets/styles/Navbar.css';
 
 function NavigationBar() {
+    const [username, setUsername] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            setUsername(storedUsername);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.clear();
+        setUsername(null);
+        navigate('/login');
+    };
+
     return (
         <Navbar bg="light" expand="lg" className="custom-navbar">
             <Container>
@@ -16,10 +32,16 @@ function NavigationBar() {
                         <Nav.Link as={Link} to="/about-us">About Us</Nav.Link>
                     </Nav>
                     <Nav>
-                        <NavDropdown title="Account" id="basic-nav-dropdown">
-                            <NavDropdown.Item as={Link} to="/login">Login</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/signup">Sign Up</NavDropdown.Item>
-                        </NavDropdown>
+                        {username ? (
+                            <NavDropdown title={username} id="basic-nav-dropdown">
+                                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                            </NavDropdown>
+                        ) : (
+                            <NavDropdown title="Account" id="basic-nav-dropdown">
+                                <NavDropdown.Item as={Link} to="/login">Login</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/signup">Sign Up</NavDropdown.Item>
+                            </NavDropdown>
+                        )}
                     </Nav>
                 </Navbar.Collapse>
             </Container>
