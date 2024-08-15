@@ -48,4 +48,12 @@ public class LeagueController {
     public void deleteLeague(@PathVariable Integer leagueId) {
         leagueService.deleteLeague(leagueId);
     }
+    
+    @GetMapping("/sport/{sportId}")
+    public ResponseEntity<List<LeagueDTO>> getLeaguesBySportId(@PathVariable Integer sportId) {
+        List<LeagueDTO> leagues = leagueService.getLeaguesBySportId(sportId);
+        return new ResponseEntity<>(leagues, HttpStatus.OK);
+    }
+
+
 }

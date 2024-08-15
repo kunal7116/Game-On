@@ -37,7 +37,7 @@ public class SportsServiceImpl implements SportsService {
 
     @Override
     public SportsDTO createSports(SportsDTO SportsDTO) {
-        Sports sports = modelMapper.map(SportsDTO, Sports.class);
+    	Sports sports = modelMapper.map(SportsDTO, Sports.class);
         sports = sportsRepository.save(sports);
         return modelMapper.map(sports, SportsDTO.class);
     }
@@ -60,8 +60,9 @@ public class SportsServiceImpl implements SportsService {
     public List<SportsDTO> getSportsByCityId(Integer cityId) {
         List<Sports> sportsList = sportsRepository.findByCityId(cityId);
         return sportsList.stream()
-                .map(sports -> modelMapper.map(sports, SportsDTO.class))
-                .collect(Collectors.toList());
+            .map(sports -> modelMapper.map(sports, SportsDTO.class))
+            .collect(Collectors.toList());
     }
+
 
 }

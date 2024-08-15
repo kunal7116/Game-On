@@ -10,5 +10,6 @@ public interface LeagueService {
     LeagueDTO createLeague(LeagueDTO leagueDTO);
     LeagueDTO updateLeague(Integer leagueId, LeagueDTO leagueDTO);
     void deleteLeague(Integer leagueId);
+	List<LeagueDTO> getLeaguesBySportId(Integer sportId);
 }
 

@@ -54,4 +54,13 @@ public class LeagueServiceImpl implements LeagueService {
     public void deleteLeague(Integer leagueId) {
         leagueRepository.deleteById(leagueId);
     }
+    
+    @Override
+    public List<LeagueDTO> getLeaguesBySportId(Integer sportId) {
+        return leagueRepository.findBySportsId(sportId).stream()
+                .map(league -> modelMapper.map(league, LeagueDTO.class))
+                .collect(Collectors.toList());
+    }
+    
+
 }

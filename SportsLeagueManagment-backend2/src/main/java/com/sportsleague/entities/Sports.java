@@ -28,8 +28,9 @@ public class Sports {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sportsId;
+    
     @Enumerated(EnumType.STRING)
-    private SportType sportsType;
+    private SportType sportType;
     private Integer cityId;
 
     @OneToMany(cascade = CascadeType.ALL)

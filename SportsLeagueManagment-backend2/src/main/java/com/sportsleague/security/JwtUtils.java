@@ -15,79 +15,86 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class JwtUtils {
 
-//	@Value("${SECRET_KEY}")
-//	private String jwtSecret;
+    @Value("${EXP_TIMEOUT}")
+    private int jwtExpirationMs;
 
-	@Value("${EXP_TIMEOUT}")
-	private int jwtExpirationMs;
+    private Key key;
 
-	private Key key;
+    @PostConstruct
+    public void init() {
+        // Generate a secure key for HS512
+        key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    }
 
-	@PostConstruct
-	public void init() {
-		// Generate a secure key for HS512
-		key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-	}
+ // Generate JWT token for the authenticated user
+    public String generateJwtToken(Authentication authentication) {
+        CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
 
-	// Generate JWT token for the authenticated user
-	public String generateJwtToken(Authentication authentication) {
-		CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
-		return Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
-				.setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
-				.claim("authorities", getAuthoritiesInString(userPrincipal.getAuthorities()))
-				.claim("user_id", userPrincipal.getUserId()).signWith(key, SignatureAlgorithm.HS512).compact();
-	}
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
+                .claim("authorities", getAuthoritiesInString(userPrincipal.getAuthorities()))  // This returns roles like ROLE_ADMIN, etc.
+                .claim("user_id", userPrincipal.getUserId())
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
 
-	// Extract username from JWT token
-	public String getUserNameFromJwtToken(Claims claims) {
-		return claims.getSubject();
-	}
 
-	// Validate JWT token and return claims
-	public Claims validateJwtToken(String jwtToken) {
-		try {
-			return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwtToken).getBody();
+    // Extract username from JWT token
+    public String getUserNameFromJwtToken(Claims claims) {
+        return claims.getSubject();
+    }
 
-		} catch (Exception e) {
-			log.error("JWT token validation failed", e);
-			throw e;
-		}
-	}
+    // Validate JWT token and return claims
+    public Claims validateJwtToken(String jwtToken) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
+        } catch (Exception e) {
+            log.error("JWT token validation failed", e);
+            throw e;
+        }
+    }
 
-	// Convert GrantedAuthority collection to comma-separated string
-	private String getAuthoritiesInString(Collection<? extends GrantedAuthority> authorities) {
-		return authorities.stream().map(authority -> authority.getAuthority()).collect(Collectors.joining(","));
-	}
+    // Convert GrantedAuthority collection to comma-separated string
+    private String getAuthoritiesInString(Collection<? extends GrantedAuthority> authorities) {
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
 
-	// Extract authorities from claims
-	public List<GrantedAuthority> getAuthoritiesFromClaims(Claims claims) {
-		String authString = (String) claims.get("authorities");
-		return AuthorityUtils.commaSeparatedStringToAuthorityList(authString);
-	}
+    // Extract authorities from claims
+    public List<GrantedAuthority> getAuthoritiesFromClaims(Claims claims) {
+        String authString = (String) claims.get("authorities");
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(authString);
+    }
 
-	// Extract user ID based on the role from claims
-	public Long getUserIdFromJwtToken(Claims claims) {
-		return Long.valueOf((int) claims.get("user_id"));
-	}
+    // Extract user ID based on the role from claims
+    public Long getUserIdFromJwtToken(Claims claims) {
+        return Long.valueOf(claims.get("user_id").toString());
+    }
 
-	// Populate Authentication token from JWT
-	public Authentication populateAuthenticationTokenFromJWT(String jwt) {
-		Claims claims = validateJwtToken(jwt);
-		String username = getUserNameFromJwtToken(claims);
-		List<GrantedAuthority> authorities = getAuthoritiesFromClaims(claims);
-		Long userId = getUserIdFromJwtToken(claims);
+    // Populate Authentication token from JWT
+    public Authentication populateAuthenticationTokenFromJWT(String jwt) {
+        Claims claims = validateJwtToken(jwt);
+        String username = getUserNameFromJwtToken(claims);
+        List<GrantedAuthority> authorities = getAuthoritiesFromClaims(claims);
+        Long userId = getUserIdFromJwtToken(claims);
 
-		return new UsernamePasswordAuthenticationToken(username, userId, authorities);
-	}
+        return new UsernamePasswordAuthenticationToken(username, userId, authorities);
+    }
 }
