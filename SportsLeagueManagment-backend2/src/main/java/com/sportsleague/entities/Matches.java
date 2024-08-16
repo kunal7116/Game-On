@@ -24,11 +24,12 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Matches {
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer matchId;
-    private Integer team1Id;
-    private Integer team2Id;
+//    private Integer team1Id;
+//    private Integer team2Id;
     private LocalDate matchDate;
     private LocalTime matchTime;
 

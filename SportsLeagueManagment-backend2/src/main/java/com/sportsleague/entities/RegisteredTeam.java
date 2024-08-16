@@ -25,8 +25,16 @@ public class RegisteredTeam {
     private Integer leagueId;
     private Integer sportsId;
     private LocalDate registrationDate;
+    private Integer userId;
+    
+//    @ManyToOne
+//    private User user;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "teamId")
-    private List<Matches> matches;
+    @JoinColumn(name = "team1Id")
+    private List<Matches> matches1;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "team2Id")
+    private List<Matches> matches2;
 }

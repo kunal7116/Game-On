@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.sportsleague.DTO.RegisteredTeamDTO;
 import com.sportsleague.entities.RegisteredTeam;
+import com.sportsleague.entities.User;
 import com.sportsleague.exception.ResourceNotFoundException;
 import com.sportsleague.repository.RegisteredTeamRepository;
+import com.sportsleague.repository.UserRepository;
 
 @Service
 public class RegisteredTeamServiceImpl implements RegisteredTeamService {
@@ -20,6 +22,9 @@ public class RegisteredTeamServiceImpl implements RegisteredTeamService {
 
     @Autowired
     private ModelMapper modelMapper;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<RegisteredTeamDTO> getAllRegisteredTeams() {
@@ -38,6 +43,9 @@ public class RegisteredTeamServiceImpl implements RegisteredTeamService {
     @Override
     public RegisteredTeamDTO createRegisteredTeam(RegisteredTeamDTO RegisteredTeamDTO) {
         RegisteredTeam team = modelMapper.map(RegisteredTeamDTO, RegisteredTeam.class);
+//        User u = userRepository.findById(RegisteredTeamDTO.getUserId()).get();
+//        team.setUser(u);
+        
         team = registeredTeamRepository.save(team);
         return modelMapper.map(team, RegisteredTeamDTO.class);
     }
