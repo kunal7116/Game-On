@@ -1,63 +1,87 @@
-import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../assets/styles/RegistrationForm.css';
 
 function RegistrationForm() {
-    const { leagueId } = useParams();
+    const { sportId, leagueId } = useParams();
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         teamName: '',
         captainFirstName: '',
         captainLastName: '',
         captainPhoneNumber: '',
         captainEmail: '',
-        teamLogo: null,
-        verification: false,
-        sportId: 1,  // Replace with actual sportId from your logic
-        leagueId: parseInt(leagueId) || 1,
     });
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'checkbox' ? checked : value,
-        });
-    };
+    const [registrationDate] = useState(new Date().toISOString().split('T')[0]); // Set today's date
+    const [userId, setUserId] = useState(null);
+    const [message, setMessage] = useState('');
 
-    const handleFileChange = (e) => {
+    useEffect(() => {
+        const storedData = localStorage.getItem('token');
+        if (storedData) {
+            const token = storedData;
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const decodedToken = JSON.parse(window.atob(base64));
+            const userId = decodedToken.user_id;
+
+            if (userId) {
+                setUserId(userId);
+            } else {
+                setMessage('User ID not found in the token. Please log in again.');
+                navigate('/login');
+            }
+        } else {
+            setMessage('No token found in localStorage. Please log in.');
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            teamLogo: e.target.files[0],
+            [name]: value,
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formDataToSend = new FormData();
-        for (const key in formData) {
-            formDataToSend.append(key, formData[key]);
+        if (!userId) {
+            setMessage('User ID not found. Please try again.');
+            return;
         }
 
+        const dataToSend = {
+            ...formData,
+            registrationDate,
+            leagueId: parseInt(leagueId),
+            sportsId: parseInt(sportId),
+            userId,
+        };
+
+        console.log("Data being sent:", dataToSend);
+
         try {
-            const response = await axios.post('/api/registered-teams', formDataToSend, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.post('http://localhost:8080/api/registered-teams', dataToSend);
+            setMessage('Registration successful!');
             console.log(response.data);
-            // Handle successful registration here
+            navigate(`/payment/${leagueId}`);  // Navigate to payment page
         } catch (error) {
-            console.error('Error:', error);
-            // Handle errors here
+            console.error('Error:', error.response?.data);
+            setMessage('Registration failed. Please try again.');
         }
     };
 
     return (
         <Container className="registration-form-container">
             <h2>Registration Form for League {leagueId}</h2>
+            {message && <Alert variant="info">{message}</Alert>}
             <Form onSubmit={handleSubmit}>
                 <Row>
                     <Col md={6}>
@@ -85,7 +109,6 @@ function RegistrationForm() {
                         </Form.Group>
                     </Col>
                 </Row>
-
                 <Row>
                     <Col md={6}>
                         <Form.Group controlId="formCaptainLastName">
@@ -103,7 +126,7 @@ function RegistrationForm() {
                         <Form.Group controlId="formCaptainPhoneNumber">
                             <Form.Label>Captain's Phone Number</Form.Label>
                             <Form.Control
-                                type="tel"
+                                type="text"
                                 name="captainPhoneNumber"
                                 value={formData.captainPhoneNumber}
                                 onChange={handleChange}
@@ -112,35 +135,38 @@ function RegistrationForm() {
                         </Form.Group>
                     </Col>
                 </Row>
-
-                <Form.Group controlId="formCaptainEmail">
-                    <Form.Label>Captain's Email</Form.Label>
-                    <Form.Control
-                        type="email"
-                        name="captainEmail"
-                        value={formData.captainEmail}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="formTeamLogo">
-                    <Form.Label>Team Logo</Form.Label>
-                    <Form.Control
-                        type="file"
-                        name="teamLogo"
-                        onChange={handleFileChange}
-                        required
-                    />
-                </Form.Group>
-                <br />
-
-                <Button variant="primary" type="submit">
-                    Submit
+                <Row>
+                    <Col md={6}>
+                        <Form.Group controlId="formCaptainEmail">
+                            <Form.Label>Captain's Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="captainEmail"
+                                value={formData.captainEmail}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group controlId="formRegistrationDate">
+                            <Form.Label>Registration Date</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="registrationDate"
+                                value={registrationDate}
+                                readOnly // Prevents editing
+                            />
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Button variant="danger" type="submit" className="mt-4">
+                    Register
                 </Button>
             </Form>
         </Container>
     );
 }
 
+// The export statement should be at the top level, outside any block or function
 export default RegistrationForm;

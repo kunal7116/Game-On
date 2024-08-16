@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import '../assets/styles/Navbar.css';
 
 function NavigationBar() {
-    const [username, setUsername] = useState(null);
+    const { auth, logout } = useAuth();
+    const [username, setUsername] = useState(auth.user);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername);
-        }
-    }, []);
+        // Update the username whenever the auth state changes
+        setUsername(auth.user);
+    }, [auth.user]);
 
     const handleLogout = () => {
-        localStorage.clear();
-        setUsername(null);
-        navigate('/login');
+        logout(navigate); // Use the logout function from AuthContext
     };
 
     return (

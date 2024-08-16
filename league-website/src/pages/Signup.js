@@ -60,12 +60,8 @@ const Signup = () => {
                 const response = await axios.post('http://localhost:8080/api/users', formData);
                 console.log('User created:', response.data);
 
-                // Redirect to the appropriate homepage based on role
-                if (formData.role === 'PLAYER') {
-                    navigate('/'); // Redirect to player homepage (root)
-                } else if (formData.role === 'LEAGUE_PROVIDER') {
-                    navigate('/league-provider-home'); // Redirect to league provider homepage
-                }
+                // Redirect to the login page after successful registration
+                navigate('/login');
 
             } catch (error) {
                 console.error('Error creating user:', error);

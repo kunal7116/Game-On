@@ -27,7 +27,7 @@ function LeaguesPage() {
     }, [sportId]);
 
     const handleRegisterClick = (leagueId) => {
-        navigate(`/register/${leagueId}`);
+        navigate(`/register/${sportId}/${leagueId}`); // Pass both sportId and leagueId
     };
 
     return (

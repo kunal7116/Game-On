@@ -3,7 +3,7 @@ import { Form, Button, Container, Row, Col, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
     const { auth, login } = useAuth();
@@ -72,6 +72,7 @@ const Login = () => {
 
                 const roles = decodedToken.authorities || [];
                 const username = decodedToken.sub;
+                const userId = decodedToken.userId; // Assuming userId is included in the token
 
                 if (roles.length === 0) {
                     throw new Error("No roles found in token");
@@ -94,6 +95,10 @@ const Login = () => {
                         setErrors({ apiError: 'Unknown role' });
                         return;
                 }
+
+                // Store token and userId in localStorage
+                localStorage.setItem('token', token);
+                localStorage.setItem('userId', userId);
 
                 // Use login function from context, pass navigate here
                 login(token, username, role, navigate);
@@ -153,6 +158,10 @@ const Login = () => {
                         <Button variant="danger" type="submit" className="w-100 mt-4">
                             Login
                         </Button>
+
+                        <div className="text-center mt-3">
+                            <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+                        </div>
                     </Form>
                 </Col>
             </Row>

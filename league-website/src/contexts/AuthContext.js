@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('username', user);
         localStorage.setItem('role', role);
 
+
         console.log("Login:", { token, user, role });
 
         if (role === 'ADMIN') {

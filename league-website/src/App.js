@@ -14,6 +14,7 @@ import LeagueProviderHomePage from './pages/LeagueProviderHomePage';
 // import AdminHomePage from './pages/AdminHomePage'; // Assuming you have an AdminHomePage component
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
+import PaymentPage from './components/PaymentPage.js'
 
 function App() {
   return (
@@ -27,10 +28,11 @@ function App() {
             <Route path="/sports/:cityId" element={<ProtectedRoute role="PLAYER"><SportsPage /></ProtectedRoute>} />
             <Route path="/leagues/:sportId" element={<ProtectedRoute role="PLAYER"><LeaguesPage /></ProtectedRoute>} />
             <Route path="/about-us" element={<AboutUsPage />} />
-            <Route path="/register" element={<ProtectedRoute role="PLAYER"><RegistrationForm /></ProtectedRoute>} />
+            <Route path="/register/:sportId/:leagueId" element={<ProtectedRoute role="PLAYER"><RegistrationForm /></ProtectedRoute>} />
             <Route path="/register/:leagueId" element={<ProtectedRoute role="PLAYER"><RegistrationForm /></ProtectedRoute>} />
             <Route path="/league-provider-home" element={<ProtectedRoute role="LEAGUE_PROVIDER"><LeagueProviderHomePage /></ProtectedRoute>} />
             {/* <Route path="/admin-home" element={<ProtectedRoute role="ADMIN"><AdminHomePage /></ProtectedRoute>} /> */}
+            <Route path="/payment/:leagueId" element={<ProtectedRoute role="PLAYER"><PaymentPage /></ProtectedRoute>} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
           </Routes>
