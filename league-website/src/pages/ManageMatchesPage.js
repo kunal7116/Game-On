@@ -19,26 +19,31 @@ const ManageMatchesPage = () => {
                     setLeagues(data);
                 } else {
                     console.error('Failed to fetch leagues:', data);
+                    setErrorMessage('Failed to fetch leagues.');
                 }
             })
-            .catch(error => console.error('Error fetching leagues:', error));
+            .catch(error => {
+                console.error('Error fetching leagues:', error);
+                setErrorMessage('Error fetching leagues.');
+            });
     }, []);
 
     useEffect(() => {
         if (selectedLeagueId) {
-            fetch(`http://localhost:8080/${selectedLeagueId}/teams`)
+            const endpoint = `http://localhost:8080/api/registered-teams/${selectedLeagueId}/teams`;
+            fetch(endpoint)
                 .then(res => {
-                    if (res.status === 404) {
-                        throw new Error('Teams not found for this league.');
+                    if (!res.ok) {
+                        throw new Error(`Error: ${res.statusText} (Status: ${res.status})`);
                     }
                     return res.json();
                 })
                 .then(data => {
-                    console.log('Fetched teams:', data);
                     if (Array.isArray(data)) {
                         setTeams(data);
                     } else {
                         console.error('Failed to fetch teams:', data);
+                        setErrorMessage('Failed to fetch teams.');
                     }
                 })
                 .catch(error => {
@@ -48,17 +53,21 @@ const ManageMatchesPage = () => {
         }
     }, [selectedLeagueId]);
 
-
     const validateTeamIds = () => {
         if (!Array.isArray(teams)) {
             console.error('Teams is not an array');
             return false;
         }
 
-        console.log('Teams:', teams);
+        // Parse the input IDs as integers for comparison
+        const team1IdInt = parseInt(selectedTeam1Id, 10);
+        const team2IdInt = parseInt(selectedTeam2Id, 10);
 
-        const validTeam1 = teams.some(team => team.teamId === selectedTeam1Id);
-        const validTeam2 = teams.some(team => team.teamId === selectedTeam2Id);
+        // Log fetched team IDs for debugging
+        console.log('Available teams:', teams.map(team => team.teamId));
+
+        const validTeam1 = teams.some(team => team.teamId === team1IdInt);
+        const validTeam2 = teams.some(team => team.teamId === team2IdInt);
 
         if (!validTeam1 || !validTeam2) {
             setErrorMessage('One or both of the team IDs are invalid. Please check the team list and try again.');
@@ -95,9 +104,13 @@ const ManageMatchesPage = () => {
                     console.log('Match created successfully:', data);
                 } else {
                     console.error('Failed to create match:', data);
+                    setErrorMessage('Failed to create match.');
                 }
             })
-            .catch(error => console.error('Error creating match:', error));
+            .catch(error => {
+                console.error('Error creating match:', error);
+                setErrorMessage('Error creating match.');
+            });
     };
 
     return (

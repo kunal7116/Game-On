@@ -87,7 +87,7 @@ const Login = () => {
                     case 'A':
                         role = 'ADMIN';
                         break;
-                    case 'LP':
+                    case 'L':
                         role = 'LEAGUE_PROVIDER';
                         break;
                     default:

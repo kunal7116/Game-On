@@ -1,0 +1,28 @@
+.leagueprovider-navbar {
+    background-color: #343a40; /* Dark background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.leagueprovider-navbar .navbar-brand {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.leagueprovider-navbar .nav-link {
+    color: #ffffff;
+    margin-right: 15px;
+    font-weight: 500;
+}
+
+.leagueprovider-navbar .nav-link:hover {
+    color: #d9534f;
+}
+
+.leagueprovider-navbar .dropdown-item {
+    color: #555;
+}
+
+.leagueprovider-navbar .dropdown-item:hover {
+    background-color: #f8f9fa;
+}

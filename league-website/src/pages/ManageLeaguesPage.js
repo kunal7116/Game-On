@@ -1,9 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Table } from 'react-bootstrap';
 import axios from 'axios';
-import '../assets/styles/AddLeaguePage.css'; // Make sure you have appropriate styling
-
-const AddLeaguePage = () => {
+function ManageLeaguesPage() {
     const [cities, setCities] = useState([]);
     const [sports, setSports] = useState([]);
     const [leagues, setLeagues] = useState([]);
@@ -227,5 +226,11 @@ const AddLeaguePage = () => {
         </div>
     );
 };
+// return (
+//     <div>
+//         <h2>Manage Leagues Page</h2>
+//     </div>
+// );
+//}
 
-export default AddLeaguePage;
+export default ManageLeaguesPage;
