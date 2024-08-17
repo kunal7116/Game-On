@@ -1,9 +1,7 @@
 package com.sportsleague.DTO;
 
-import java.math.BigDecimal;
+import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,10 +15,12 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString	
 public class MatchesDTO {
-		private Integer matchId;
-	    private Integer team1Id;
-	    private Integer team2Id;
-	    private LocalDate matchDate;
-	    private LocalTime matchTime;
-	    private Integer leagueId;
+    private Integer matchId;
+    private Integer team1Id;
+    
+    private Integer team2Id;
+  
+    private LocalDate matchDate;
+//    x`
+    private Integer leagueId;
 }

@@ -44,9 +44,9 @@ public class League {
     @JoinColumn(name = "leagueId")
     private List<RegisteredTeam> registeredTeams;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "leagueId")
-    private List<Matches> matches;
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "leagueId")
+//    private List<Matches> matches;
 
     // Getters and Setters
 }

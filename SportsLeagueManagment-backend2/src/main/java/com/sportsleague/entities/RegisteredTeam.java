@@ -30,11 +30,11 @@ public class RegisteredTeam {
 //    @ManyToOne
 //    private User user;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "team1Id")
-    private List<Matches> matches1;
-    
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "team2Id")
-    private List<Matches> matches2;
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "team1Id")
+//    private List<Matches> matches1;
+//    
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "team2Id")
+//    private List<Matches> matches2;
 }

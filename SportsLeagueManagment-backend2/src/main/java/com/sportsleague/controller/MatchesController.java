@@ -33,13 +33,13 @@ public class MatchesController {
     }
 
     @PostMapping
-    public MatchesDTO createMatch(@RequestBody MatchesDTO MatchesDTO) {
-        return matchService.createMatch(MatchesDTO);
+    public MatchesDTO createMatch(@RequestBody MatchesDTO matchesDTO) {
+        return matchService.createMatch(matchesDTO);
     }
 
     @PutMapping("/{matchId}")
-    public MatchesDTO updateMatch(@PathVariable Integer matchId, @RequestBody MatchesDTO MatchesDTO) {
-        return matchService.updateMatch(matchId, MatchesDTO);
+    public MatchesDTO updateMatch(@PathVariable Integer matchId, @RequestBody MatchesDTO matchesDTO) {
+        return matchService.updateMatch(matchId, matchesDTO);
     }
 
     @DeleteMapping("/{matchId}")

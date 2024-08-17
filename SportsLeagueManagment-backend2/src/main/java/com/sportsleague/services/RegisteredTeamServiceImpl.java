@@ -63,5 +63,7 @@ public class RegisteredTeamServiceImpl implements RegisteredTeamService {
     public void deleteRegisteredTeam(Integer teamId) {
         registeredTeamRepository.deleteById(teamId);
     }
+
+
 }
 

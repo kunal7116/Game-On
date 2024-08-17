@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sportsleague.DTO.SportsDTO;
+import com.sportsleague.entities.SportType;
 import com.sportsleague.services.SportsService;
 
 
@@ -51,6 +52,11 @@ public class SportsController {
     @GetMapping("/city/{cityId}")
     public List<SportsDTO> getSportsByCityId(@PathVariable Integer cityId) {
         return sportsService.getSportsByCityId(cityId);
+    }
+    
+    @GetMapping("/types")
+    public SportType[] getSportTypes() {
+        return SportType.values();
     }
 
 }
