@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/AuthContext.js
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -11,14 +13,19 @@ export const AuthProvider = ({ children }) => {
         role: localStorage.getItem('role'),
     });
 
-    const login = (token, user, role, navigate) => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (auth.token) {
+            // Set token in header or other related actions if necessary
+        }
+    }, [auth.token]);
+
+    const login = (token, user, role) => {
         setAuth({ token, user, role });
         localStorage.setItem('token', token);
         localStorage.setItem('username', user);
         localStorage.setItem('role', role);
-
-
-        console.log("Login:", { token, user, role });
 
         if (role === 'ADMIN') {
             navigate('/admin-home', { replace: true });
@@ -32,11 +39,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = (navigate) => {
+    const logout = () => {
         setAuth({ token: null, user: null, role: null });
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
+        // Remove token from header or other related actions if necessary
         navigate('/login', { replace: true });
     };
 
@@ -46,4 +54,3 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-

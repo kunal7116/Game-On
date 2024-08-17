@@ -1,0 +1,28 @@
+.admin-navbar {
+    background-color: #343a40; /* Dark background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-navbar .navbar-brand {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.admin-navbar .nav-link {
+    color: #ffffff;
+    margin-right: 15px;
+    font-weight: 500;
+}
+
+.admin-navbar .nav-link:hover {
+    color: #d9534f;
+}
+
+.admin-navbar .dropdown-item {
+    color: #555;
+}
+
+.admin-navbar .dropdown-item:hover {
+    background-color: #f8f9fa;
+}

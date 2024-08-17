@@ -1,3 +1,4 @@
+// src/components/NavigationBar.js
 import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
