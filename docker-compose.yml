@@ -1,0 +1,166 @@
+# =============================================================
+# Game-On — Docker Compose Stack
+# =============================================================
+# This file defines the three services that make up the app:
+#
+#   db        — MySQL 8 database
+#   backend   — Spring Boot REST API  (port 8080)
+#   frontend  — React SPA via Nginx   (port 3000 → container:80)
+#
+# HOW TO START:
+#   1. Copy .env.example to .env and fill in real values.
+#   2. Run: docker compose up --build
+#
+# HOW DOCKER COMPOSE NETWORKING WORKS:
+#   Compose creates a private virtual network named game-on-network.
+#   Every service is reachable by its SERVICE NAME as a hostname.
+#   So the backend connects to MySQL at db:3306 — NOT localhost:3306.
+#   This is why SPRING_DATASOURCE_URL below uses "db" not "localhost".
+# =============================================================
+
+services:
+
+  # -----------------------------------------------------------
+  # db — MySQL 8 database
+  # -----------------------------------------------------------
+  # WHY a health check?
+  # MySQL takes a few seconds to initialise after the container
+  # starts.  Without a health check, the backend might try to
+  # connect before MySQL is ready and crash immediately.
+  # The health check makes Compose wait until mysqladmin ping
+  # succeeds before starting the backend.
+  # -----------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: game-on-db
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      # host:container — exposes MySQL on localhost:3306 for
+      # tools like MySQL Workbench running on your machine.
+      - "3306:3306"
+
+    volumes:
+      # Named volume: data persists even if the container is
+      # removed.  Without this every docker compose down wipes
+      # all your database data.
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    networks:
+      - game-on-network
+
+
+  # -----------------------------------------------------------
+  # backend — Spring Boot REST API
+  # -----------------------------------------------------------
+  # depends_on with condition: service_healthy means Docker Compose
+  # will NOT start this service until the db health check passes.
+  # This solves the "backend crashed because DB wasn't ready" problem.
+  # -----------------------------------------------------------
+  backend:
+    build:
+      context: ./SportsLeagueManagment-backend2
+      dockerfile: Dockerfile
+    container_name: game-on-backend
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy   # Wait for MySQL to pass its health check
+
+    environment:
+      # Override the localhost URL from application.properties.
+      # "db" here is the service name — Docker resolves it to the
+      # IP of the db container on the game-on-network.
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+      # JWT signing secret — never hard-coded, always from .env
+      JWT_SECRET: ${JWT_SECRET}
+
+      # Tell the backend which origin the frontend is served from
+      # so CORS is configured correctly.
+      FRONTEND_ORIGIN: http://localhost:3000
+
+      # JPA / general settings
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - game-on-network
+
+
+  # -----------------------------------------------------------
+  # frontend — React SPA served by Nginx
+  # -----------------------------------------------------------
+  # depends_on with condition: service_started means Docker Compose
+  # starts the frontend after the backend container exists and is
+  # running (not necessarily accepting connections yet).
+  # The React app itself is just static files — Nginx can serve
+  # them regardless of whether the backend is healthy.
+  # -----------------------------------------------------------
+  frontend:
+    build:
+      context: ./league-website
+      dockerfile: Dockerfile
+    container_name: game-on-frontend
+    restart: unless-stopped
+
+    depends_on:
+      backend:
+        condition: service_started   # Start after backend container is up
+
+    ports:
+      # The Nginx container listens on port 80 internally.
+      # We map it to host port 3000 so you open localhost:3000
+      # in your browser — matching the expected frontend URL.
+      - "3000:80"
+
+    networks:
+      - game-on-network
+
+
+# =============================================================
+# Named Volumes
+# =============================================================
+# Declaring the volume here lets Docker manage its lifecycle
+# independently of any service.  You can remove a container
+# without losing the database data.
+#
+# To wipe all data and start fresh:
+#   docker compose down -v
+# =============================================================
+volumes:
+  mysql_data:
+    driver: local
+
+
+# =============================================================
+# Networks
+# =============================================================
+# A user-defined bridge network is better than the default
+# network because:
+#   1. Service discovery by name works reliably.
+#   2. Only services on this network can talk to each other.
+#   3. You can give it a meaningful name for clarity.
+# =============================================================
+networks:
+  game-on-network:
+    driver: bridge

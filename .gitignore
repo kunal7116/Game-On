@@ -1,1 +1,24 @@
+# =============================================================
+# Game-On — Root .gitignore
+# =============================================================
+
+# ---------------------------------------------------------------
+# Secrets — NEVER commit these
+# ---------------------------------------------------------------
+# The actual .env file contains real passwords and secrets.
+# .env.example (with placeholder values) IS committed to Git
+# so other developers know what variables they need to set.
+.env
+*.env
+
+# ---------------------------------------------------------------
+# Eclipse / Spring Tool Suite workspace metadata
+# ---------------------------------------------------------------
 /.metadata/
+.metadata/
+
+# ---------------------------------------------------------------
+# OS-generated files
+# ---------------------------------------------------------------
+.DS_Store
+Thumbs.db

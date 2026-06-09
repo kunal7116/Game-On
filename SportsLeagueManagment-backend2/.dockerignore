@@ -1,0 +1,33 @@
+# Maven build output — the builder stage regenerates this inside
+# the container, so there is no need to send it to the Docker daemon.
+target/
+
+# Git metadata — not needed inside the image.
+.git/
+.gitignore
+
+# Markdown files — documentation only, not code.
+*.md
+
+# Eclipse / Spring Tool Suite IDE project files.
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+
+# IntelliJ IDEA IDE files.
+.idea/
+*.iml
+
+# VS Code settings.
+.vscode/
+
+# Eclipse workspace metadata (nested .metadata folders).
+.metadata/
+
+# Servers configuration created by Spring Tool Suite.
+Servers/
+
+# macOS filesystem metadata.
+.DS_Store
