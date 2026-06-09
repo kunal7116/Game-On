@@ -1,0 +1,218 @@
+# =============================================================
+# CI/CD Pipeline — Game-On Sports League Management System
+# =============================================================
+#
+# WHAT THIS FILE IS:
+#   A GitHub Actions workflow.  GitHub reads this YAML file and
+#   runs it automatically on every push or pull request.
+#   You don't need to install or configure any CI server.
+#
+# HOW IT WORKS:
+#   Every push to main triggers three jobs:
+#
+#   build-backend  ──┐
+#                    ├── (both pass) ──▶  docker-build-push
+#   build-frontend ──┘                    (only on push to main)
+#
+#   build-backend and build-frontend run IN PARALLEL to save time.
+#   docker-build-push runs only after both pass, and only on
+#   direct pushes to main (not on pull requests).
+#
+# FIRST-TIME SETUP:
+#   Add these secrets to your GitHub repo:
+#   Settings → Secrets and variables → Actions → New repository secret
+#     DOCKER_HUB_USERNAME   your Docker Hub username
+#     DOCKER_HUB_TOKEN      a Docker Hub access token (not your password)
+#                           Create one at: hub.docker.com → Account Settings
+#                                          → Security → Access Tokens
+# =============================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  # =============================================================
+  # Job 1: Build and verify the Spring Boot backend
+  # =============================================================
+  # WHY mvn clean verify (not mvn package)?
+  #   "verify" runs the full build lifecycle including integration
+  #   tests if any exist.  "package" stops before the verify phase.
+  #   Using "verify" ensures we catch all test failures.
+  # =============================================================
+  build-backend:
+    name: Build Backend (Java 11 / Maven)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the repository code onto the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Java 11 on the runner.
+      # "temurin" is the open-source build of OpenJDK from Adoptium.
+      - name: Set up Java 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      # Step 3: Cache the Maven local repository.
+      # WHY CACHE?  Maven downloads all dependencies from the internet
+      # on the first run (~300 MB for this project).  Caching saves
+      # those files between pipeline runs.  The cache key includes the
+      # hash of pom.xml — if you add/remove a dependency (changing
+      # pom.xml) the cache is invalidated and dependencies are
+      # re-downloaded.  Otherwise the cached copy is reused.
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('SportsLeagueManagment-backend2/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Step 4: Build the project and run any tests.
+      # working-directory sets the shell's cwd to the backend folder
+      # so Maven can find pom.xml.
+      - name: Build and verify with Maven
+        working-directory: SportsLeagueManagment-backend2
+        run: mvn clean verify -B
+        # -B = batch mode: suppresses Maven's download progress bars,
+        #      making the GitHub Actions log much easier to read.
+
+
+  # =============================================================
+  # Job 2: Build the React frontend
+  # =============================================================
+  # WHY npm ci (not npm install)?
+  #   npm ci installs exact versions from package-lock.json.
+  #   npm install may silently upgrade packages within version
+  #   ranges, producing different results on different runs.
+  #   For CI you always want reproducible installs.
+  # =============================================================
+  build-frontend:
+    name: Build Frontend (Node 18 / npm)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Node.js 18 on the runner.
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Cache node_modules between pipeline runs.
+      # The cache key is based on package-lock.json — if you add
+      # or remove a package the cache is invalidated automatically.
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: league-website/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('league-website/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Install exact dependency versions from package-lock.json.
+      - name: Install dependencies
+        working-directory: league-website
+        run: npm ci
+
+      # Build the production React bundle.
+      # CI=false prevents React from treating ESLint warnings as
+      # errors (which would fail the build for trivial style issues).
+      - name: Build React application
+        working-directory: league-website
+        run: npm run build
+        env:
+          CI: false
+
+
+  # =============================================================
+  # Job 3: Build Docker images and push to Docker Hub
+  # =============================================================
+  # This job runs ONLY when:
+  #   1. Both build-backend AND build-frontend succeed (needs:)
+  #   2. The event is a push to main (not a pull_request)
+  #
+  # WHY ONLY ON PUSH TO MAIN?
+  #   We don't want to push an image from a work-in-progress PR.
+  #   Only code that has been reviewed and merged to main should
+  #   produce a published Docker image.
+  #
+  # WHAT IS A DOCKER IMAGE TAG?
+  #   :latest      → always points to the newest push
+  #   :<git-sha>   → points to the exact commit that built it
+  #   The git-sha tag lets you roll back to any previous version
+  #   by running: docker pull yourname/game-on-backend:abc1234
+  # =============================================================
+  docker-build-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]   # Only run after both CI jobs pass
+
+    # Skip this job on pull_request events — only run on direct
+    # pushes to main (i.e., after a PR is merged).
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Log in to Docker Hub using credentials stored as GitHub Secrets.
+      # DOCKER_HUB_TOKEN should be a Docker Hub access token, not your
+      # account password.  Tokens can be revoked without changing your
+      # password if they are ever compromised.
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      # Set up Docker Buildx.
+      # Buildx is the modern Docker build engine that supports:
+      #   - Multi-platform builds (amd64, arm64)
+      #   - BuildKit features including layer caching to GitHub Actions cache
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Compute the short (7-character) git SHA for image tagging.
+      # This lets you trace any running container back to the exact
+      # commit that produced it.
+      - name: Compute short git SHA
+        id: sha
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # Build the backend Docker image and push it to Docker Hub.
+      # cache-from / cache-to: GitHub Actions cache is used so that
+      # unchanged Docker layers are reused between pipeline runs.
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./SportsLeagueManagment-backend2
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/game-on-backend:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/game-on-backend:${{ steps.sha.outputs.short_sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Build the frontend Docker image and push it to Docker Hub.
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./league-website
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/game-on-frontend:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/game-on-frontend:${{ steps.sha.outputs.short_sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

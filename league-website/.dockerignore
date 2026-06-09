@@ -1,0 +1,36 @@
+# node_modules is the single biggest reason Docker builds are slow
+# without a .dockerignore.  It can be hundreds of MB.
+# The builder stage runs npm ci inside the container — it does NOT
+# need node_modules from the host machine.
+node_modules/
+
+# The build/ folder is the OUTPUT of npm run build.
+# The builder stage creates it fresh inside the container.
+build/
+
+# Git metadata — not needed inside the image.
+.git/
+.gitignore
+
+# Markdown documentation files.
+*.md
+
+# Environment files contain secrets — never include them in an image.
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.test
+
+# macOS filesystem metadata.
+.DS_Store
+
+# Editor configuration files.
+.vscode/
+.idea/
+
+# npm / yarn debug logs.
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
