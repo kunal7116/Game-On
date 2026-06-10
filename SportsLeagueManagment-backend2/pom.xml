@@ -58,6 +58,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- H2 in-memory database for unit/integration tests in CI.
+		     Avoids the need for a real MySQL instance during mvn verify. -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
