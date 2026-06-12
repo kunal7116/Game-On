@@ -37,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
      * environment variable.  Falls back to http://localhost:3000 when
      * the variable is absent or empty (local development without Docker).
      */
-    @Value("${FRONTEND_ORIGIN:http://localhost:3000}")
+    @Value("${app.frontend.origin:http://localhost:3000}")
     private String frontendOrigin;
 
     @Override

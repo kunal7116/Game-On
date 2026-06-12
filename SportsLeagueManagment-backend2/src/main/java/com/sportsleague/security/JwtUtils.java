@@ -47,12 +47,12 @@ public class JwtUtils {
 
     /**
      * JWT signing secret.
-     * Spring Boot's relaxed binding maps the environment variable
-     * JWT_SECRET to the property key JWT_SECRET.
-     * The fallback value is used only when APP_ENV=local is set
-     * (local development without Docker).
+     * Reads from the app.jwt.secret property, which is mapped from
+     * the JWT_SECRET environment variable in application.properties.
+     * Using a different property key avoids the circular placeholder
+     * reference error that occurs when key name == env-var name.
      */
-    @Value("${JWT_SECRET}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
     private Key key;
